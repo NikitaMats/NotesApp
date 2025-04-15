@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+    <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NotesApp.Views.NoteDetailPage"
+             Title="Редактирование заметки">
+
+        <ContentPage.ToolbarItems>
+            <ToolbarItem Text="Сохранить" Command="{Binding SaveCommand}"/>
+        </ContentPage.ToolbarItems>
+
+        <StackLayout Padding="20" Spacing="10">
+            <Entry Placeholder="Заголовок"
+               Text="{Binding Note.Title}"
+               FontSize="Medium"/>
+
+            <Editor Placeholder="Текст заметки"
+                Text="{Binding Note.Content}"
+                AutoSize="TextChanges"
+                HeightRequest="200"/>
+
+            <Label Text="{Binding Note.CreatedDate, StringFormat='Создано: {0:dd.MM.yyyy HH:mm}'}"
+               FontSize="Micro"
+               TextColor="Gray"/>
+
+            <Button Text="Удалить заметку"
+                Command="{Binding DeleteCommand}"
+                BackgroundColor="LightPink"
+                TextColor="White"/>
+        </StackLayout>
+    </ContentPage>
