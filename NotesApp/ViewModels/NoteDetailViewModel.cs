@@ -31,7 +31,7 @@ namespace NotesApp.ViewModels
 
         public async Task LoadNote(int id)
         {
-            if (id > 0)
+            if (id != 0)
             {
                 Note = await _noteService.GetNoteAsync(id) ?? new Note();
             }

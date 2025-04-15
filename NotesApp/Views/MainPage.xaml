@@ -1,28 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:viewmodels="clr-namespace:NotesApp.ViewModels" xmlns:model="clr-namespace:NotesApp.Model"
+             x:DataType="viewmodels:MainPageViewModel"
              x:Class="NotesApp.Views.MainPage"
              Title="{Binding PageTitle}">
 
     <Grid>
         <RefreshView Command="{Binding RefreshCommand}">
             <CollectionView ItemsSource="{Binding Notes}"
-                          SelectionMode="Single"
-                          SelectionChangedCommand="{Binding SelectNoteCommand}"
-                          SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
-
+                            SelectionMode="Single"
+                            SelectionChangedCommand="{Binding SelectNoteCommand}"
+                            SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="model:Note">
+                        <!-- Явно указываем тип -->
                         <StackLayout Padding="10">
-                            <Label Text="{Binding Title}" FontSize="Medium" FontAttributes="Bold"/>
-                            <Label Text="{Binding Content}" FontSize="Small" TextColor="Gray"/>
+                            <!-- Теперь Binding ищет свойства в классе Note -->
+                            <Label Text="{Binding Title}" 
+                       FontSize="Medium"
+                       FontAttributes="Bold"/>
+                            <Label Text="{Binding Content}"
+                       FontSize="Small"
+                       TextColor="Gray"/>
                         </StackLayout>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </RefreshView>
 
-        <!-- Floating Action Button -->
         <Button Text="+" 
                 Command="{Binding AddNoteCommand}"
                 FontSize="Large"
