@@ -31,23 +31,30 @@ namespace NotesApp.ViewModels
 
         public async Task LoadNote(int id)
         {
-            if (id > 0)
+            if (id != 0)
             {
-                Note = await _noteService.GetNoteAsync(id) ?? new Note();
+                Note = await _noteService.GetNoteAsync(id);
+            }
+            else
+            {
+                Note = new Note();
             }
         }
 
-        private async Task SaveNote()
+        private async Task SaveNote()  // ⚡ Основная логика сохранения
         {
             if (string.IsNullOrWhiteSpace(Note.Title))
+            {
+                await Application.Current.MainPage.DisplayAlert("Ошибка", "Введите заголовок", "OK");
                 return;
+            }
 
             if (Note.Id == 0)
                 await _noteService.AddNoteAsync(Note);
             else
-                await _noteService.UpdateNoteAsync(Note);
+                await _noteService.UpdateNoteAsync(Note);  
 
-            await Shell.Current.GoToAsync("..");
+            await Shell.Current.GoToAsync("..");  
         }
 
         private async Task DeleteNote()

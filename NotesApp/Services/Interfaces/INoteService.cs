@@ -8,7 +8,7 @@ namespace NotesApp.Services.Interfaces
     {
         Task<List<Note>> GetNotesAsync();
         Task<Note> GetNoteAsync(int id);
-        Task AddNoteAsync(Note note);
+        Task<int> AddNoteAsync(Note note);
         Task UpdateNoteAsync(Note note);
         Task DeleteNoteAsync(Note note);
     }

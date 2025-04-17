@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SQLite;
 using System.IO;
+using System.Linq;
 
 namespace NotesApp.Services.Implementations
 {
@@ -21,12 +22,28 @@ namespace NotesApp.Services.Implementations
         }
 
         public async Task<List<Note>> GetNotesAsync() => await _db.Table<Note>().ToListAsync();
-        public async Task AddNoteAsync(Note note) => await _db.InsertAsync(note);
-        public async Task UpdateNoteAsync(Note note) => await _db.UpdateAsync(note);
-        public async Task DeleteNoteAsync(Note note) => await _db.DeleteAsync(note);
-        public async Task<Note> GetNoteAsync(int id)
+
+        public async Task<int> AddNoteAsync(Note note)
         {
-            return await _db.Table<Note>().Where(n => n.Id == id).FirstOrDefaultAsync();
+            // Получаем максимальный существующий ID
+            var allNotes = await _db.Table<Note>().ToListAsync();
+            note.Id = allNotes.Count > 0 ? allNotes.Max(n => n.Id) + 1 : 1;
+
+            await _db.InsertAsync(note);
+            return note.Id;
+        }
+        public async Task UpdateNoteAsync(Note note) 
+        {
+            if (note.Id <= 0) throw new ArgumentException("Invalid note ID");
+            await _db.UpdateAsync(note);
+        }
+
+        public async Task DeleteNoteAsync(Note note) => await _db.DeleteAsync(note);
+
+        public async Task<Note> GetNoteAsync(int id)          {
+            return await _db.Table<Note>()
+                .Where(n => n.Id == id)
+                .FirstOrDefaultAsync();
         }
     }
 }

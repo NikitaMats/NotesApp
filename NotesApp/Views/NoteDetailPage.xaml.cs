@@ -1,33 +1,37 @@
-﻿using NotesApp.Services.Interfaces;
-using NotesApp.ViewModels;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using NotesApp.ViewModels;
+using NotesApp.Services.Interfaces;
 
 namespace NotesApp.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
+    [QueryProperty(nameof(NoteId), "noteId")]  //  Прием параметра из URL
     public partial class NoteDetailPage : ContentPage
     {
+        private string _noteId;
+
+        public string NoteId
+        {
+            get => _noteId;
+            set
+            {
+                _noteId = value;
+                LoadNote();  //  Запуск загрузки при изменении ID
+            }
+        }
+
         public NoteDetailPage()
         {
             InitializeComponent();
             BindingContext = new NoteDetailViewModel(DependencyService.Get<INoteService>());
         }
 
-        protected override async void OnAppearing()
+        private async void LoadNote()
         {
-            base.OnAppearing();
-
-            if (BindingContext is NoteDetailViewModel vm)
+            if (int.TryParse(NoteId, out var id))
             {
-                var noteId = 0;
-                var query = Shell.Current.CurrentState.Location.OriginalString;
-                if (query.Contains("id="))
-                {
-                    var idStr = query.Split('=')[1].Split('&')[0]; // Безопасное извлечение ID
-                    int.TryParse(idStr, out noteId);
-                }
-                await vm.LoadNote(noteId);
+                await ((NoteDetailViewModel)BindingContext).LoadNote(id);  //  Загрузка данных
             }
         }
     }

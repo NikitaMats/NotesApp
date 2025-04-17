@@ -11,37 +11,67 @@ namespace NotesApp.ViewModels
     public class MainPageViewModel : BaseViewModel
     {
         private readonly INoteService _noteService;
+        private bool _isRefreshing;
+        private string _pageTitle = "Мои заметки";
 
         public ObservableCollection<Note> Notes { get; } = new ObservableCollection<Note>();
         public ICommand AddNoteCommand { get; }
         public ICommand SelectNoteCommand { get; }
         public ICommand RefreshCommand { get; }
 
-        public string PageTitle => "Мои заметки"; // Фиксированный заголовок
+        public string PageTitle
+        {
+            get => _pageTitle;
+            set => SetProperty(ref _pageTitle, value);
+        }
+
+        public bool IsRefreshing
+        {
+            get => _isRefreshing;
+            set => SetProperty(ref _isRefreshing, value);
+        }
 
         public MainPageViewModel(INoteService noteService)
         {
-            _noteService = noteService;
+            _noteService = noteService ?? throw new System.ArgumentNullException(nameof(noteService));
+            Notes = new ObservableCollection<Note>();
 
-            AddNoteCommand = new Command(async () =>
-            await Shell.Current.GoToAsync($"{nameof(NoteDetailPage)}?id=0"));
-
-            SelectNoteCommand = new Command<Note>(note =>
-            {
-                if (note != null)
-                    Shell.Current.GoToAsync($"{nameof(NoteDetailPage)}?id={note.Id}");
-            });
-
+            // Инициализация команд
+            AddNoteCommand = new Command(OnAddNote);
+            SelectNoteCommand = new Command<Note>(OnNoteSelected);
             RefreshCommand = new Command(async () => await LoadNotes());
+        }
 
-            LoadNotes();
+        private async void OnAddNote()
+        {
+            await Shell.Current.GoToAsync(nameof(Views.NoteDetailPage));
+        }
+
+        private async void OnNoteSelected(Note note)
+        {
+            if (note != null)
+            {
+                await Shell.Current.GoToAsync($"{nameof(NoteDetailPage)}?noteId={note.Id}");
+            }
         }
 
         public async Task LoadNotes()
         {
-            Notes.Clear();
-            var notes = await _noteService.GetNotesAsync();
-            foreach (var note in notes) Notes.Add(note);
+            try
+            {
+                IsRefreshing = true;
+                Notes.Clear();
+
+                var notes = await _noteService.GetNotesAsync();
+                foreach (var note in notes)
+                {
+                    Notes.Add(note);
+                }
+            }
+            finally
+            {
+                IsRefreshing = false;
+            }
         }
     }
 }
