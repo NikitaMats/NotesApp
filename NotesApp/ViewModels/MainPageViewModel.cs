@@ -1,7 +1,10 @@
 ﻿using NotesApp.Model;
 using NotesApp.Services.Interfaces;
 using NotesApp.Views;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
@@ -13,8 +16,26 @@ namespace NotesApp.ViewModels
         private readonly INoteService _noteService;
         private bool _isRefreshing;
         private string _pageTitle = "Мои заметки";
+        private string _searchText;
+        private List<Note> _allNotes;
 
         public ObservableCollection<Note> Notes { get; } = new ObservableCollection<Note>();
+
+        // Свойство для текста поиска
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (SetProperty(ref _searchText, value))
+                {
+                    // При изменении текста сразу фильтруем заметки
+                    FilterNotes();
+                }
+            }
+        }
+
+        public ICommand SearchCommand { get; }
         public ICommand AddNoteCommand { get; }
         public ICommand SelectNoteCommand { get; }
         public ICommand RefreshCommand { get; }
@@ -40,6 +61,26 @@ namespace NotesApp.ViewModels
             AddNoteCommand = new Command(OnAddNote);
             SelectNoteCommand = new Command<Note>(OnNoteSelected);
             RefreshCommand = new Command(async () => await LoadNotes());
+            SearchCommand = new Command(FilterNotes);
+        }
+
+        // Метод для фильтрации заметок
+        private void FilterNotes()
+        {
+            if (_allNotes == null) return;
+
+            var filteredNotes = string.IsNullOrWhiteSpace(SearchText)
+                ? _allNotes
+                : _allNotes.Where(n =>
+                    (n.Title?.ToLower().Contains(SearchText.ToLower()) ?? false) ||
+                    (n.Content?.ToLower().Contains(SearchText.ToLower()) ?? false))
+                  .ToList();
+
+            Notes.Clear();
+            foreach (var note in filteredNotes)
+            {
+                Notes.Add(note);
+            }
         }
 
         private async void OnAddNote()
@@ -62,11 +103,8 @@ namespace NotesApp.ViewModels
                 IsRefreshing = true;
                 Notes.Clear();
 
-                var notes = await _noteService.GetNotesAsync();
-                foreach (var note in notes)
-                {
-                    Notes.Add(note);
-                }
+                _allNotes = await _noteService.GetNotesAsync();
+                FilterNotes();
             }
             finally
             {

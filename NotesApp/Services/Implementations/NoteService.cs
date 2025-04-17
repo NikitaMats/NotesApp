@@ -23,6 +23,18 @@ namespace NotesApp.Services.Implementations
 
         public async Task<List<Note>> GetNotesAsync() => await _db.Table<Note>().ToListAsync();
 
+        public async Task<List<Note>> SearchNotesAsync(string searchText)
+        {
+            if (string.IsNullOrWhiteSpace(searchText))
+                return await GetNotesAsync();
+
+            return await _db.Table<Note>()
+                .Where(n =>
+                    n.Title.Contains(searchText) ||
+                    n.Content.Contains(searchText))
+                .ToListAsync();
+        }
+
         public async Task<int> AddNoteAsync(Note note)
         {
             // Получаем максимальный существующий ID
