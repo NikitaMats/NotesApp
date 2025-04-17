@@ -13,16 +13,18 @@
                             SelectionChangedCommand="{Binding SelectNoteCommand}"
                             SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
                 <CollectionView.ItemTemplate>
+                    <!-- Явно указываем тип -->
                     <DataTemplate x:DataType="model:Note">
-                        <!-- Явно указываем тип -->
                         <StackLayout Padding="10">
-                            <!-- Теперь Binding ищет свойства в классе Note -->
+                            <!-- Binding ищет свойства в классе Note -->
                             <Label Text="{Binding Title}" 
                        FontSize="Medium"
                        FontAttributes="Bold"/>
+                            <!-- Binding ищет свойства в классе Note -->
                             <Label Text="{Binding Content}"
                        FontSize="Small"
                        TextColor="Gray"/>
+                            <Label Text="{Binding Id, StringFormat='ID: {0}'}" FontSize="Micro"/>
                         </StackLayout>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

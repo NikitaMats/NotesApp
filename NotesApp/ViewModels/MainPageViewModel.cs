@@ -1,5 +1,6 @@
 ﻿using NotesApp.Model;
 using NotesApp.Services.Interfaces;
+using NotesApp.Views;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -50,7 +51,7 @@ namespace NotesApp.ViewModels
         {
             if (note != null)
             {
-                await Shell.Current.GoToAsync($"{nameof(Views.NoteDetailPage)}?noteId={note.Id}");
+                await Shell.Current.GoToAsync($"{nameof(NoteDetailPage)}?noteId={note.Id}");
             }
         }
 
