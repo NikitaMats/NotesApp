@@ -2,7 +2,9 @@
 <Shell xmlns="http://xamarin.com/schemas/2014/forms"
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
        xmlns:views="clr-namespace:NotesApp.Views"
-       x:Class="NotesApp.AppShell">
+       x:Class="NotesApp.AppShell"
+       FlyoutBehavior="Disabled">
+    <!-- Отключаем меню -->
 
     <ShellContent Title="Заметки"
                   ContentTemplate="{DataTemplate views:MainPage}"
